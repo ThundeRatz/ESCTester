@@ -97,13 +97,13 @@ int main(){
             while (~botao){}
             if (timerCount > ONES_COUNT) //Se estiver segurando
             {
-                ppmOut(p, mode);
                 buzzer(166);
                 _delay_ms(500);
                 buzzer(209);
                 _delay_ms(500);
                 buzzer(249);
                 _delay_ms(1000);
+                ppmOut(p, mode);
             }
             else //Mudar o modo
             {
