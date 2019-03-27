@@ -29,8 +29,8 @@ typedef enum modes {
  */
 
 // Pinos que não tem a ver com os LEDS ficam como estão, os outros zeram
-#define D_RESET (PORTD & 0b00000100)
-#define B_RESET (PORTB & 0b00111111)
+#define D_RESET ((PORTD & 0b00000100) | 0b11111011)
+#define B_RESET ((PORTB & 0b00111111) | 0b11000000)
 
 #define A1 ((1 << PD5) << 8)
 #define B1 ((1 << PD6) << 8)
@@ -80,8 +80,8 @@ int main(){
     ADCSRA |= (1<<ADEN) | (1<<ADPS2) | (1<<ADPS1) | (1<<ADPS0);
 
     //Inicializacao da PWM
-    TCCR1A |= (1 << WGM11) | (1<<COM1A1) | (1<<COM1B1);
-    TCCR1B |= (1 << WGM12) | (1 << WGM13) | (1<<CS11);
+    // TCCR1A |= (1 << WGM11) | (1<<COM1A1) | (1<<COM1B1);
+    // TCCR1B |= (1 << WGM12) | (1 << WGM13) | (1<<CS11);
 
     modes_t mode = NO_MODE;
     unsigned int p;
@@ -90,30 +90,30 @@ int main(){
     {
         p = adcMeas();
         display(p);
-        if (~botao)
-        {   
-        	resetTimer();
-	        startTimer();
-            while (~botao){}
-            if (timerCount > ONES_COUNT) //Se estiver segurando
-            {
-                buzzer(166);
-                _delay_ms(500);
-                buzzer(209);
-                _delay_ms(500);
-                buzzer(249);
-                _delay_ms(1000);
-                ppmOut(p, mode);
-            }
-            else //Mudar o modo
-            {
-                if (mode == 5) 
-                    mode = 1;
-                else mode++;
-                display(mode);
-                while (timerCount < ONES_COUNT){}    
-            }
-        }
+        // if (~botao)
+        // {   
+        // 	resetTimer();
+	    //     startTimer();
+        //     while (~botao){}
+        //     if (timerCount > ONES_COUNT) //Se estiver segurando
+        //     {
+        //         buzzer(166);
+        //         _delay_ms(500);
+        //         buzzer(209);
+        //         _delay_ms(500);
+        //         buzzer(249);
+        //         _delay_ms(1000);
+        //         ppmOut(p, mode);
+        //     }
+        //     else //Mudar o modo
+        //     {
+        //         if (mode == 5) 
+        //             mode = 1;
+        //         else mode++;
+        //         display(mode);
+        //         while (timerCount < ONES_COUNT){}    
+        //     }
+        // }
     }
 }
 
@@ -182,8 +182,8 @@ void ppmOut(int p, modes_t mode){
 
 // pins = PORTD << 8 | PORTB
 void set_display(uint8_t display, uint16_t pins) {
-    PORTD = D_RESET | ((pins >> 8) & 0xFF) | display;
-    PORTB = B_RESET | (pins & 0xFF);
+    PORTD = D_RESET & ~(((pins >> 8) & 0xFF) | display);
+    PORTB = B_RESET & ~(pins & 0xFF);
 }
 
 void sevenSegWrite(uint8_t display, uint8_t digit){
@@ -280,19 +280,19 @@ void display(unsigned int digit) {
 }
 
 int adcMeas(){
-    double p;
+    int p;
     //Inicia a conversao
     ADCSRA |= (1 << ADSC);
 
     //Ate terminar a conversao
     while (ADCSRA & (1 << ADSC));
 	
-    p = (double) (100 * ADC) / 1024;
+    p = 100 * (float)ADC / 1024.0;
 
     return p;
 }
 
 void buzzer(int freq){
-    ICR1 = (double) (1 / freq) * 1000000;
+    ICR1 = (float) (1 / freq) * 1000000;
     OCR1B = ICR1 / 2;
 }
