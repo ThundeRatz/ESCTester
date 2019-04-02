@@ -19,9 +19,9 @@ typedef enum modes {
     VAR_DOIS_BI,
     VAR_UM_BI,
     FIXO_BI,
-} modes_t; 
+} modes_t;
 
-#define ONES_COUNT		25000	
+#define ONES_COUNT		25000
 
  /* _____________a____b____c____d____e____f____g__
  * DISPLAY 1 | PD5  PD6  PD4  PD3  PD1  PB7  PB6
@@ -57,7 +57,7 @@ typedef enum modes {
 #define resetTimer()	TCNT1 = 0
 
 #define ppm OCR1A
-#define botao PD2 
+//#define botao PD2
 
 #define ledOff()	PORTB &= ~(1<<PB3)
 #define ledOn()		PORTB |= (1<<PB3)
@@ -69,51 +69,63 @@ void display(unsigned int);
 void buzzer(int);
 int adcMeas(void);
 void set_display(uint8_t , uint16_t );
+static bool botao;
 
 int main(){
     //Pinos de saída
     DDRB |= (1<<PB1) | (1<<PB2) | (1<<PB3) | (1<<PB6) | (1<<PB7);
     DDRD |= ~(1<<PD2);
+    DDRD &= ~(1<<PD2);
 
     //Inicializacao do ADC
     ADMUX |= (1<<REFS0);
     ADCSRA |= (1<<ADEN) | (1<<ADPS2) | (1<<ADPS1) | (1<<ADPS0);
 
     //Inicializacao da PWM
-    // TCCR1A |= (1 << WGM11) | (1<<COM1A1) | (1<<COM1B1);
-    // TCCR1B |= (1 << WGM12) | (1 << WGM13) | (1<<CS11);
+    TCCR1A |= (1 << WGM11) | (1<<COM1A1) | (1<<COM1B1);
+    TCCR1B |= (1 << WGM12) | (1 << WGM13) | (1<<CS11);
+    ICR1 = 20000; //Para a frequencia ser 50 Hz
 
-    modes_t mode = NO_MODE;
+    // modes_t mode = NO_MODE;
     unsigned int p;
+    unsigned mode = 0;
 
     while (1)
     {
         p = adcMeas();
         display(p);
-        // if (~botao)
-        // {   
-        // 	resetTimer();
-	    //     startTimer();
-        //     while (~botao){}
-        //     if (timerCount > ONES_COUNT) //Se estiver segurando
-        //     {
-        //         buzzer(166);
-        //         _delay_ms(500);
-        //         buzzer(209);
-        //         _delay_ms(500);
-        //         buzzer(249);
-        //         _delay_ms(1000);
-        //         ppmOut(p, mode);
-        //     }
-        //     else //Mudar o modo
-        //     {
-        //         if (mode == 5) 
-        //             mode = 1;
-        //         else mode++;
-        //         display(mode);
-        //         while (timerCount < ONES_COUNT){}    
-        //     }
-        // }
+        ledOn();
+        botao = PIND & (1 << PD2);
+
+        if (botao == 0)
+        {
+        	resetTimer();
+	        startTimer();
+            // while (botao == 0){
+            //     ledOff();
+            // }
+            if (timerCount > ONES_COUNT) //Se estiver segurando
+            {
+                buzzer(166);
+                _delay_ms(500);
+                buzzer(209);
+                _delay_ms(500);
+                buzzer(249);
+                _delay_ms(1000);
+                ppmOut(p, mode);
+            }
+            else //Mudar o modo
+            {
+                if (mode == 5)
+                    mode = 1;
+                else mode++;
+                display(mode);
+                resetTimer();
+	            startTimer();
+                while (timerCount < ONES_COUNT){
+                }
+            }
+        }
     }
 }
 
@@ -124,22 +136,22 @@ void ppmOut(int p, modes_t mode){
     int atual = 1000;
     int atualRev = 1460;
     bool subida = 1;
-    
+
     ICR1 = 20000; //Para a frequencia ser 50 Hz
 
     while (botao)
-    {    
+    {
         switch (mode)
         {
             case VAR_UNI: //variavel, unidirecional
-                
+
                 if (atual == ppmMax){
                     subida = 0;
-                } 
-                    
+                }
+
                 else if (atual == 1000){
                     subida = 1;
-                } 
+                }
                 if (subida)
                     atual++;
                 else atual--;
@@ -201,7 +213,7 @@ void sevenSegWrite(uint8_t display, uint8_t digit){
                 set_display(SD1, B1 | C1);
             }
             else if (display == 2){
-                set_display(SD2, B2 | C2);            
+                set_display(SD2, B2 | C2);
             }
             break;
 		case 2:
@@ -209,56 +221,56 @@ void sevenSegWrite(uint8_t display, uint8_t digit){
 			    set_display(SD1, A1 | B1 | D1 | E1 | G1);
             } else if (display == 2) {
                 set_display(SD2, A2 | B2 | D2 | E2 | G2);
-			} 
+			}
             break;
 		case 3:
             if (display == 1) {
 			    set_display(SD1, A1 | B1 | C1 | D1 | G1);
             } else if (display == 2) {
                 set_display(SD2, A2 | B2 | C2 | D2 | G2);
-            } 
+            }
             break;
 		case 4:
             if (display == 1) {
         	    set_display(SD1, B1 | C1 | F1 | G1);
             } else if (display == 2) {
                 set_display(SD2, B2 | C2 | F2 | G2);
-            } 
+            }
             break;
 		case 5:
 			if (display == 1) {
                 set_display(SD1, A1 | C1 | D1 | F1 | G1);
             } else if (display == 2) {
                 set_display(SD2, A2 | C2 | D2 | F2 | G2);
-            } 
+            }
             break;
 		case 6:
             if (display == 1) {
 			    set_display(SD1, A1 | C1 | D1 | E1 | F1 | G1);
             } else if (display == 2) {
                 set_display(SD2, A2 | C2 | D2 | E2 | F2 | G2);
-            } 
+            }
             break;
 		case 7:
             if (display == 1) {
 			    set_display(SD1, A1 | B1 | C1);
             } else if (display == 2) {
                 set_display(SD2, A2 | B2 | C2);
-            } 
+            }
             break;
 		case 8:
             if (display == 1) {
 			    set_display(SD1, A1 | B1 | C1 | D1 | E1 | F1 | G1);
             } else if (display == 2) {
                 set_display(SD2, A2 | B2 | C2 | D2 | E2 | F2 | G2);
-            } 
+            }
             break;
 		case 9:
 			if (display == 1) {
                 set_display(SD1, A1 | B1 | C1 | F1 | G1);
             } else if (display == 2) {
                 set_display(SD2, A2 | B2 | C2 | F2 | G2);
-            } 
+            }
             break;
 		default:
 		    set_display(SD1, 0);
@@ -267,7 +279,7 @@ void sevenSegWrite(uint8_t display, uint8_t digit){
 
 void display(unsigned int digit) {
 	int u, d;
-    
+
     //Dezena e unidade
     d = digit / 10;
     u = digit % 10;
@@ -286,7 +298,7 @@ int adcMeas(){
 
     //Ate terminar a conversao
     while (ADCSRA & (1 << ADSC));
-	
+
     p = 100 * (float)ADC / 1024.0;
 
     return p;
