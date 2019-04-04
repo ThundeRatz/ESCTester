@@ -13,8 +13,8 @@
 MCU        = atmega8
 CLOCK      = 8
 PROGRAMMER = usbasp
-LFUSE      = 0xFF
-HFUSE      = 0xDF
+LFUSE      = 0xD4
+HFUSE      = 0xD9
 EXT        = .c
 
 PART       = $(MCU)
