@@ -2,8 +2,9 @@
  * @file	main.c
  * @brief	ThundeRatz's ESC_Tester Project Firmware.
  *
- * @author	ThundeRatz Robotics Team - POLI-USP: http://thunderatz.org/ \n
+ * @author	ThundeRatz Robotics Team - POLI-USP: http://thunderatz.org/
  *			Support email: contato@thunderatz.org
+ *          Hama
  *
  * @date	11 March 2019
  */
@@ -21,7 +22,7 @@ typedef enum modes {
     FIXO_BI,
 } modes_t;
 
-#define ONES_COUNT		25000
+#define ONES_COUNT		18000
 
  /* _____________a____b____c____d____e____f____g__
  * DISPLAY 1 | PD5  PD6  PD4  PD3  PD1  PB7  PB6
@@ -56,20 +57,25 @@ typedef enum modes {
 #define pauseTimer()	TCCR1B = 0
 #define resetTimer()	TCNT1 = 0
 
-#define ppm OCR1A
-//#define botao PD2
+#define ppm OCR1B
+#define som OCR1A
 
 #define ledOff()	PORTB &= ~(1<<PB3)
 #define ledOn()		PORTB |= (1<<PB3)
 #define ledToggle()	PORTB ^= (1<<PB3)
 
+#define PERIODO 16965
+
+void pwmInit();
 void ppmOut(int, modes_t);
 void sevenSegWrite(uint8_t display, uint8_t digit);
 void display(unsigned int);
-void buzzer(int);
-int adcMeas(void);
+void buzzer();
+int adcMeas();
 void set_display(uint8_t , uint16_t );
+
 static bool botao;
+static unsigned mode = 0;
 
 int main(){
     //Pinos de saída
@@ -81,14 +87,8 @@ int main(){
     ADMUX |= (1<<REFS0);
     ADCSRA |= (1<<ADEN) | (1<<ADPS2) | (1<<ADPS1) | (1<<ADPS0);
 
-    //Inicializacao da PWM
-    TCCR1A |= (1 << WGM11) | (1<<COM1A1) | (1<<COM1B1);
-    TCCR1B |= (1 << WGM12) | (1 << WGM13) | (1<<CS11);
-    ICR1 = 20000; //Para a frequencia ser 50 Hz
-
     // modes_t mode = NO_MODE;
     unsigned int p;
-    unsigned mode = 0;
 
     while (1)
     {
@@ -97,22 +97,25 @@ int main(){
         ledOn();
         botao = PIND & (1 << PD2);
 
-        if (botao == 0)
-        {
+        if (botao == 0) {   //Ao apertar o botão
+            pauseTimer();
         	resetTimer();
 	        startTimer();
-            // while (botao == 0){
-            //     ledOff();
-            // }
-            if (timerCount > ONES_COUNT) //Se estiver segurando
-            {
-                buzzer(166);
-                _delay_ms(500);
-                buzzer(209);
-                _delay_ms(500);
-                buzzer(249);
-                _delay_ms(1000);
-                ppmOut(p, mode);
+
+            while (botao == 0){ //Medir quanto tempo o botão foi apertado
+                p = adcMeas();
+                botao = PIND & (1 << PD2);
+                display(p);
+                if (timerCount > 18000){ //Segurou por muito tempo
+                    pauseTimer();
+                    break;
+                }
+            }
+            pauseTimer();
+            if (timerCount > 15000){ //Se estiver segurando
+                buzzer();
+                ppmOut(p, mode); //inicia o sinal de PPM
+                pauseTimer();
             }
             else //Mudar o modo
             {
@@ -120,76 +123,126 @@ int main(){
                     mode = 1;
                 else mode++;
                 display(mode);
-                resetTimer();
-	            startTimer();
-                while (timerCount < ONES_COUNT){
-                }
+                _delay_ms(500);
+                pauseTimer();
             }
         }
     }
 }
 
+void pwmInit(){
+    //Inicializacao da fast PWM, período regulado pelo ICR1
+    TCCR1A |= (1 << WGM11);
+    TCCR1B |= (1 << WGM12) | (1 << WGM13) | (1<<CS11);
+
+    //Habilita
+    TCCR1A |= (1 << COM1B1);
+    TCCR1A |= (1 << COM1A1);
+
+    ICR1 = PERIODO; //Para a frequencia ser 50 Hz
+}
+
 void ppmOut(int p, modes_t mode){
-    int ppmMax = 1000 + 1000 * p; // OC1A vai ate 20000, entao a ppm deve ir de 1000 a 2000.
-    int ppmMaxRev = 1460 + 500 * p;
-    int ppmMinRev = 1460 - 500 * p;
+    pwmInit();
+    int ppmMax = 1000 + 10 * p; // OCR1B vai ate 20000, entao a ppm deve ir de 1000 a 2000.
+    int ppmMaxRev = 1460 + 5 * p;
+    int ppmMinRev = 1460 - 5 * p;
     int atual = 1000;
     int atualRev = 1460;
     bool subida = 1;
 
-    ICR1 = 20000; //Para a frequencia ser 50 Hz
+    botao = PIND & (1 << PD2);
+    som = 0;
 
-    while (botao)
-    {
+    if ((mode == 1) | (mode == 2)){ //Calibrar
+        ppm = 2000;
+        _delay_ms(3000);
+        ppm = 1000;
+        _delay_ms(3000);
+    }
+
+    if ((mode == 3) | (mode == 4) | (mode == 5)){ //Calibrar para bidirecional
+        ppm = 2000;
+        _delay_ms(3000);
+        ppm = 1000;
+        _delay_ms(3000);
+        ppm = 1460;
+        _delay_ms(3000);
+    }
+
+    //Espera o fim da calibração
+    _delay_ms(6000);
+
+    while (botao == 1){ //Até apertar o botão novamente
+        if(subida){
+            ledOn();
+        }
+        else {
+            ledOff();
+        }
+        botao = PIND & (1 << PD2);
         switch (mode)
         {
             case VAR_UNI: //variavel, unidirecional
 
-                if (atual == ppmMax){
+                if (atual >= ppmMax){
                     subida = 0;
+                    ledOff();
                 }
 
-                else if (atual == 1000){
+                else if (atual < 1000){
                     subida = 1;
+                    ledOn();
                 }
                 if (subida)
                     atual++;
-                else atual--;
+                else if (subida == 0)
+                    atual--;
                 ppm = atual;
-                _delay_ms(50);
+                _delay_ms(15);
                 break;
             case FIXO_UNI: // fixo, unidirecional
                 if (atual < ppmMax)
                     atual++;
                 ppm = atual;
-                _delay_ms(50);
+                _delay_ms(15);
                 break;
             case VAR_DOIS_BI: // variavel, dois sentidos, bidirecional
                 if (atualRev == ppmMaxRev)
                     subida = 0;
                 else if (atualRev == ppmMinRev)
                     subida = 1;
-                if (subida) atualRev++;
-                else atualRev--;
+                if (subida)
+                     atualRev++;
+                else
+                    atualRev--;
                 ppm = atualRev;
-                _delay_ms(50);
+                _delay_ms(15);
                 break;
             case VAR_UM_BI: // variavel, um sentido, bidirecional
-                if (atualRev == ppmMaxRev) subida = 0;
-                else if (atualRev == 1460) subida = 1;
-                if (subida) atualRev++;
-                else atualRev--;
+                if (atualRev == ppmMaxRev)
+                    subida = 0;
+                else if (atualRev == 1460)
+                    subida = 1;
+                if (subida)
+                    atualRev++;
+                else
+                    atualRev--;
                 ppm = atualRev;
-                _delay_ms(50);
+                _delay_ms(15);
             case FIXO_BI: // fixo, bidirecional
-                if (atualRev < ppmMaxRev) atual++;
+                if (atualRev < ppmMaxRev)
+                    atualRev++;
                 ppm = atualRev;
-                _delay_ms(50);
+                _delay_ms(15);
             default:
                 ppm = 0;
                 break;
         }
     }
+    //Desativa a PWM, para o timer ficar livre
+    TCCR1A = 0;
+    TCCR1B = 0;
 }
 
 // pins = PORTD << 8 | PORTB
@@ -284,11 +337,12 @@ void display(unsigned int digit) {
     d = digit / 10;
     u = digit % 10;
 
+	sevenSegWrite(2, d);
+	_delay_ms(2);
+
     sevenSegWrite(1, u);
 	_delay_ms(2);
 
-	sevenSegWrite(2, d);
-	_delay_ms(2);
 }
 
 int adcMeas(){
@@ -299,12 +353,29 @@ int adcMeas(){
     //Ate terminar a conversao
     while (ADCSRA & (1 << ADSC));
 
-    p = 100 * (float)ADC / 1024.0;
+    p = 100 * (float)ADC / 1024.0; //Porcentagem
 
     return p;
 }
 
-void buzzer(int freq){
-    ICR1 = (float) (1 / freq) * 1000000;
-    OCR1B = ICR1 / 2;
+void buzzer(){
+    unsigned int i = 0;
+
+    while (i < 3){
+        display(mode);
+        pwmInit();
+        TCCR1A &= ~(1 << COM1B1); //Desativa a saída de PWM no sinal PPM
+        som = 20000;
+        ledOff();
+        _delay_ms(500);
+
+        TCCR1A = 0; //Desativa a PWM do buzzer
+        TCCR1B = 0;
+        ledOn();
+        _delay_ms(500);
+
+        i++;
+    }
+    TCCR1A = 0;
+    TCCR1B = 0;
 }
