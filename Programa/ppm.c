@@ -13,39 +13,44 @@
 #include <stdbool.h>
 #include <util/delay.h>
 
+#include "led.h"
 #include "ppm.h"
 #include "timer.h"
-#include "led.h"
 
-void ppm_init(){
+#define PPM_REG OCR1B
+#define PPM_CALIB_INTERVAL_MS 3000
+#define PPM_CALIB_POST_TIME_MS 6000
+
+void ppm_init() {
     DDRB |= (1 << PB2);
     TCCR1A &= ~(1 << COM1A1);
     PPM_REG = 0;
 }
 
-void calibrate(mode_t mode){
+void calibrate(mode_t mode) {
     timer_deinit();
     pwm_init(TIM_PPM_PERIOD);
-    if ((mode == 1) | (mode == 2)) {  // Calibrar
+
+    if ((mode == VAR_UNI) | (mode == FIXO_UNI)) {  // Calibrar
         PPM_REG = PPM_MAX;
-        _delay_ms(3000);
+        _delay_ms(PPM_CALIB_INTERVAL_MS);
         PPM_REG = PPM_MIN;
-        _delay_ms(3000);
+        _delay_ms(PPM_CALIB_INTERVAL_MS);
     }
 
-    if ((mode == 3) | (mode == 4) | (mode == 5)) {  // Calibrar para bidirecional
+    if ((mode == VAR_DOIS_BI) | (mode == VAR_UM_BI) | (mode == FIXO_BI)) {  // Calibrar para bidirecional
         PPM_REG = PPM_MAX;
-        _delay_ms(3000);
+        _delay_ms(PPM_CALIB_INTERVAL_MS);
         PPM_REG = PPM_MIN;
-        _delay_ms(3000);
+        _delay_ms(PPM_CALIB_INTERVAL_MS);
         PPM_REG = PPM_MID;
-        _delay_ms(3000);
+        _delay_ms(PPM_CALIB_INTERVAL_MS);
     }
-    //Espera a calibracao da ESC
-    _delay_ms(6000);
+    // Espera a calibracao da ESC
+    _delay_ms(PPM_CALIB_POST_TIME_MS);
 }
 
-uint16_t ppm(uint8_t adc, mode_t mode, uint16_t atual) {
+void ppm(uint8_t adc, mode_t mode) {
     static bool subida = true;
 
     uint16_t ppm_max_uni = PPM_MIN + 10 * adc;  // OCR1B vai ate 20000, entao a ppm deve ir de 1000 a 2000.
@@ -59,63 +64,79 @@ uint16_t ppm(uint8_t adc, mode_t mode, uint16_t atual) {
     }
 
     switch (mode) {
-        case VAR_UNI:  // variavel, unidirecional
+        case NO_MODE: {
+            PPM_REG = 0;
+            break;
+        }
 
-            if (atual >= ppm_max_uni) {
-                subida = 0;
+        case VAR_UNI: {  // variavel, unidirecional
+            if (PPM_REG >= ppm_max_uni) {
+                subida = false;
                 led_off();
             }
 
-            else if (atual < PPM_MIN) {
-                subida = 1;
+            else if (PPM_REG < PPM_MIN) {
+                subida = true;
                 led_on();
             }
-            if (subida)
-                atual++;
-            else if (subida == 0)
-                atual--;
-            PPM_REG = atual;
-            _delay_ms(15);
+
+            if (subida) {
+                PPM_REG++;
+            } else if (subida == 0) {
+                PPM_REG--;
+            }
+
             break;
-        case FIXO_UNI:  // fixo, unidirecional
-            if (atual < ppm_max_uni)
-                atual++;
-            PPM_REG = atual;
-            _delay_ms(15);
+        }
+
+        case FIXO_UNI: {  // fixo, unidirecional
+            if (PPM_REG < ppm_max_uni) {
+                PPM_REG++;
+            }
+
             break;
-        case VAR_DOIS_BI:  // variavel, dois sentidos, bidirecional
-            if (atual == ppm_max_rev)
-                subida = 0;
-            else if (atual == ppm_min_rev)
-                subida = 1;
-            if (subida)
-                atual++;
-            else
-                atual--;
-            PPM_REG = atual;
-            _delay_ms(15);
+        }
+
+        case VAR_DOIS_BI: {  // variavel, dois sentidos, bidirecional
+            if (PPM_REG == ppm_max_rev) {
+                subida = false;
+            } else if (PPM_REG == ppm_min_rev) {
+                subida = true;
+            }
+
+            if (subida) {
+                PPM_REG++;
+            } else {
+                PPM_REG--;
+            }
+
             break;
-        case VAR_UM_BI:  // variavel, um sentido, bidirecional
-            if (atual == ppm_max_rev)
-                subida = 0;
-            else if (atual == PPM_MID)
-                subida = 1;
-            if (subida)
-                atual++;
-            else
-                atual--;
-            PPM_REG = atual;
-            _delay_ms(15);
+        }
+
+        case VAR_UM_BI: {  // variavel, um sentido, bidirecional
+            if (PPM_REG == ppm_max_rev) {
+                subida = false;
+            } else if (PPM_REG == PPM_MID) {
+                subida = true;
+            }
+
+            if (subida) {
+                PPM_REG++;
+            } else {
+                PPM_REG--;
+            }
+
             break;
-        case FIXO_BI:  // fixo, bidirecional
-            if (atual < ppm_max_rev)
-                atual++;
-            PPM_REG = atual;
-            _delay_ms(15);
+        }
+
+        case FIXO_BI: {  // fixo, bidirecional
+            if (PPM_REG < ppm_max_rev) {
+                PPM_REG++;
+            }
+
             break;
-        default:
-            PPM_REG = 0;
-            break;
+        }
     }
-    return atual;
+
+    _delay_ms(15);
 }
