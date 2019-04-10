@@ -59,7 +59,7 @@ int main() {
                 display(adc);
                 led_on();
 
-                if (button() == 0) {
+                if (button() == 0) {    //Ao apertar o botao
                     timer_deinit();
                     pause_timer();
                     reset_timer();
@@ -81,7 +81,7 @@ int main() {
                     buzzer_beep(BEEPS);
 
                     led_off();
-
+                    //Calibra apenas uma vez
                     if (calibrado == false) {
                         calibrate(mode);
                         calibrado = true;
@@ -90,11 +90,10 @@ int main() {
                     led_on();
                     current_state = PPM;
 
-                    pwm_init(TIM_PPM_PERIOD);
-
                     reset_timer();
                     timer_deinit();
 
+                    //Configura a ppm em 50Hz
                     pwm_init(TIM_PPM_PERIOD);
                 } else if (button() != 0) {
                     mode = (mode % 5) + 1; //Modos de 1 a 5
@@ -108,14 +107,13 @@ int main() {
             }
 
             case PPM: {
-                if ((mode == VAR_UNI) | (mode == FIXO_UNI)){
-                    atual = ppm (adc, mode, atual);
-                }
-                else {
-                    atual_rev = ppm (adc, mode, atual_rev);
+                if ((mode == VAR_UNI) | (mode == FIXO_UNI)){    //Modos unidirecionais
+                    atual = ppm(adc, mode, atual);
+                }else { //Modos bidirecionais
+                    atual_rev = ppm(adc, mode, atual_rev);
                 }
 
-                if (button() == 0) {
+                if (button() == 0) { //Ao apertar o botao, ele volta ao modo de seleção
                     current_state = CHOOSE;
                     timer_deinit();
                 }
