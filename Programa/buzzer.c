@@ -15,11 +15,8 @@
 #include "buzzer.h"
 #include "timer.h"
 
-#define led_off() PORTB &= ~(1 << PB3)
-#define led_on() PORTB |= (1 << PB3)
-
 void buzzer_on(void) {
-    BUZZER_PWM_REG = TIM_BUZZER_PERIOD/2;
+    BUZZER_PWM_REG = TIM_BUZZER_PERIOD;
     TCCR1A &= ~(1 << COM1B1);
 }
 
