@@ -19,7 +19,8 @@
 #define led_on() PORTB |= (1 << PB3)
 
 void buzzer_on(void) {
-    BUZZER_PWM_REG = TIM_BUZZER_PERIOD;
+    BUZZER_PWM_REG = TIM_BUZZER_PERIOD/2;
+    TCCR1A &= ~(1 << COM1B1);
 }
 
 void buzzer_off(void) {

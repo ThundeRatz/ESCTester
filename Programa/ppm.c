@@ -14,13 +14,18 @@
 #include <util/delay.h>
 
 #include "ppm.h"
+#include "timer.h"
 #include "led.h"
 
 void ppm_init(){
     DDRB |= (1 << PB2);
+    TCCR1A &= ~(1 << COM1A1);
+    PPM_REG = 0;
 }
 
 void calibrate(mode_t mode){
+    timer_deinit();
+    pwm_init(TIM_PPM_PERIOD);
     if ((mode == 1) | (mode == 2)) {  // Calibrar
         PPM_REG = PPM_MAX;
         _delay_ms(3000);
@@ -36,7 +41,7 @@ void calibrate(mode_t mode){
         PPM_REG = PPM_MID;
         _delay_ms(3000);
     }
-
+    //Espera a calibracao da ESC
     _delay_ms(6000);
 }
 
