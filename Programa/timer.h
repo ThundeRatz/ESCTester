@@ -20,7 +20,7 @@
 #define pause_timer() (TCCR1B = 0)
 #define reset_timer() (TCNT1 = 0)
 
-void timer_init();
-void timer_deinit();
+void pwm_init(uint16_t);
+void timer_deinit(void);
 
 #endif  // __TIMER_H__

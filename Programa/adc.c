@@ -25,10 +25,9 @@ uint8_t get_adc() {
     ADCSRA |= (1 << ADSC);
 
     // Ate terminar a conversao
-    while (ADCSRA & (1 << ADSC))
-        ;
+    while (ADCSRA & (1 << ADSC));
 
-    measure = 100 * (float) ADC / 1023.0;  // Porcentagem
+    measure = 100 * (float) ADC / 1024.0;  // Porcentagem
 
     return measure;
 }

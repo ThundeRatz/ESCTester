@@ -32,7 +32,7 @@ void buzzer_init(void) {
 }
 
 void buzzer_beep(uint8_t beeps) {
-    timer_init(TIM_BUZZER_PERIOD);
+    pwm_init(TIM_BUZZER_PERIOD);
 
     while (beeps--) {
         led_on();

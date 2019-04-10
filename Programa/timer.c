@@ -13,7 +13,7 @@
 
 #include "timer.h"
 
-void timer_init(uint16_t period) {
+void pwm_init(uint16_t period) {
     // Inicializacao da fast PWM, período regulado pelo ICR1
     TCCR1A |= (1 << WGM11);
     TCCR1B |= (1 << WGM12) | (1 << WGM13) | (1 << CS11);
@@ -26,6 +26,7 @@ void timer_init(uint16_t period) {
 }
 
 void timer_deinit() {
+    //Apaga as configurações do timer
     reset_timer();
     TCCR1A = 0;
     TCCR1B = 0;
