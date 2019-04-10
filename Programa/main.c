@@ -10,8 +10,8 @@
  */
 
 #include <avr/io.h>
-#include <util/delay.h>
 #include <stdbool.h>
+#include <util/delay.h>
 
 #include "adc.h"
 #include "button.h"
@@ -31,19 +31,17 @@ typedef enum state {
     PPM,
 } state_t;
 
-state_t current_state = INIT;
+static state_t current_state = INIT;
 
 int main() {
     uint8_t adc = 0;
     mode_t mode = NO_MODE;
-    uint16_t atual = PPM_MIN;
-    uint16_t atual_rev = PPM_MID;
     bool calibrado = false;
 
     for (;;) {
         switch (current_state) {
             case INIT: {
-                //Inicializa os pinos
+                // Inicializa os pinos
                 display_init();
                 buzzer_init();
                 adc_init();
@@ -96,7 +94,7 @@ int main() {
                     //Configura a ppm em 50Hz
                     pwm_init(TIM_PPM_PERIOD);
                 } else if (button() != 0) {
-                    mode = (mode % 5) + 1; //Modos de 1 a 5
+                    mode = (mode % 5) + 1;  // Modos de 1 a 5
                     display(mode);
                     _delay_ms(500);
 
@@ -107,11 +105,7 @@ int main() {
             }
 
             case PPM: {
-                if ((mode == VAR_UNI) | (mode == FIXO_UNI)){    //Modos unidirecionais
-                    atual = ppm(adc, mode, atual);
-                }else { //Modos bidirecionais
-                    atual_rev = ppm(adc, mode, atual_rev);
-                }
+                ppm(adc, mode);
 
                 if (button() == 0) { //Ao apertar o botao, ele volta ao modo de seleção
                     current_state = CHOOSE;

@@ -12,7 +12,6 @@
 #if !defined(__PPM_H__)
 #define __PPM_H__
 
-#define PPM_REG OCR1B  // PB2
 #define PPM_MIN 1000
 #define PPM_MID 1460
 #define PPM_MAX 2000
@@ -28,6 +27,6 @@ typedef enum mode {
 
 void ppm_init(void);
 void calibrate(mode_t);
-uint16_t ppm(uint8_t adc, mode_t mode, uint16_t atual);
+void ppm(uint8_t adc, mode_t mode);
 
 #endif // __PPM_H__
