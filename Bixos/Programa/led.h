@@ -1,5 +1,5 @@
 /**
- * @file    button.h
+ * @file    led.h
  * @brief   ThundeRatz's ESC_Tester Project Firmware.
  *
  * @author Gustavo Hama <gustavo.hama@thunderatz.org>
@@ -8,31 +8,35 @@
  * @date 04/2018
  */
 
-#if !defined(__BUTTON_H__)
-#define __BUTTON_H__
-
-#include <stdbool.h>
+#if !defined(__LED_H__)
+#define __LED_H__
 
 /*****************************************
  * Public Constant Definitions
  *****************************************/
 
-#define BUTTON_DDR (DDRD)
-#define BUTTON_PORT (PORTD)
-#define BUTTON_PIN (PIND)
-#define BUTTON_PINX (PD2)
+#define LED_DDR (DDRB)
+#define LED_PORT (PORTB)
+#define LED_PIN (PINB)
+#define LED_PINX (PB3)
 
 /*****************************************
  * Public Function Prototypes
  *****************************************/
 
 /**
- * @brief Gets button reading.
- *
- * @return Button value
- * @retval true pressed
- * @retval false released
+ * @brief Initialize led pin.
  */
-bool button_pressed(void);
+void led_init(void);
 
-#endif  // __BUTTON_H__
+/**
+ * @brief Turns LED off.
+ */
+void led_off(void);
+
+/**
+ * @brief Turns LED on.
+ */
+void led_on(void);
+
+#endif  // __LED_H__

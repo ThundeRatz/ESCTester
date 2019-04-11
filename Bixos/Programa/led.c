@@ -1,5 +1,5 @@
 /**
- * @file    button.c
+ * @file    led.c
  * @brief   ThundeRatz's ESC_Tester Project Firmware.
  *
  * @author Gustavo Hama <gustavo.hama@thunderatz.org>
@@ -10,12 +10,20 @@
 
 #include <avr/io.h>
 
-#include "button.h"
+#include "led.h"
 
 /*****************************************
  * Public Functions Bodies Definitions
  *****************************************/
 
-bool button_pressed(void) {
-    return (BUTTON_PIN & (1 << BUTTON_PINX)) == 0;
+void led_init(void) {
+
+}
+
+void led_off(void) {
+
+}
+
+void led_on(void) {
+
 }

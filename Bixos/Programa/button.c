@@ -17,5 +17,5 @@
  *****************************************/
 
 bool button_pressed(void) {
-    return (BUTTON_PIN & (1 << BUTTON_PINX)) == 0;
+
 }

@@ -26,38 +26,17 @@
  *****************************************/
 
 void buzzer_init(void) {
-    BUZZER_DDR |= (1 << BUZZER_PIN);
 
-    // Inicializacao da fast PWM, período regulado pelo ICR1
-    TCCR1A = (1 << WGM11);
-    TCCR1B = (1 << WGM12) | (1 << WGM13) | (1 << CS11);
-
-    // Habilita
-    TCCR1A |= (1 << COM1A1);
-
-    ICR1 = TIM_BUZZER_PERIOD;  // Para a frequencia ser 50 Hz
-
-    buzzer_off();
 }
 
 void buzzer_on(void) {
-    BUZZER_PWM_REG = TIM_BUZZER_PERIOD;
+
 }
 
 void buzzer_off(void) {
-    BUZZER_PWM_REG = 0;
+
 }
 
 void buzzer_beep(uint8_t beeps) {
-    buzzer_init();
 
-    while (beeps--) {
-        led_on();
-        buzzer_on();
-        _delay_ms(BUZZER_BEEP_DELAY_MS);
-
-        led_off();
-        buzzer_off();
-        _delay_ms(BUZZER_BEEP_DELAY_MS);
-    }
 }

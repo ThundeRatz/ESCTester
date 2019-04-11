@@ -32,9 +32,6 @@ typedef enum ppm_mode {
     NO_MODE,     /**< No mode */
     VAR_UNI,     /**< Variable unidirectional */
     FIXO_UNI,    /**< Fixed unidirectional */
-    VAR_DOIS_BI, /**< Variable bidirectional */
-    VAR_UM_BI,   /**< Fixed bidirectional */
-    FIXO_BI,     /**< Fixed bidirectional */
 } ppm_mode_t;
 
 /*****************************************

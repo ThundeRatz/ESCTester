@@ -26,13 +26,22 @@
 
 void ppm_init() {
     DDRB |= (1 << PB2);
-    TCCR1A &= ~(1 << COM1A1);
+
+    // Inicializacao da fast PWM, período regulado pelo ICR1
+    TCCR1A = (1 << WGM11);
+    TCCR1B = (1 << WGM12) | (1 << WGM13) | (1 << CS11);
+
+    // Habilita
+    TCCR1A |= (1 << COM1B1);
+
+    ICR1 = TIM_PPM_PERIOD;  // Para a frequencia ser 50 Hz
+
     PPM_REG = 0;
 }
 
 void calibrate(ppm_mode_t mode) {
     timer_deinit();
-    pwm_init(TIM_PPM_PERIOD);
+    ppm_init();
 
     if ((mode == VAR_UNI) | (mode == FIXO_UNI)) {  // Calibrar
         PPM_REG = PPM_MAX;

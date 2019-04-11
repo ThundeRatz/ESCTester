@@ -1,5 +1,5 @@
 /**
- * @file    button.c
+ * @file    adc.c
  * @brief   ThundeRatz's ESC_Tester Project Firmware.
  *
  * @author Gustavo Hama <gustavo.hama@thunderatz.org>
@@ -10,12 +10,16 @@
 
 #include <avr/io.h>
 
-#include "button.h"
+#include "adc.h"
 
 /*****************************************
  * Public Functions Bodies Definitions
  *****************************************/
 
-bool button_pressed(void) {
-    return (BUTTON_PIN & (1 << BUTTON_PINX)) == 0;
+void adc_init(void) {
+
+}
+
+uint8_t get_adc(void) {
+
 }
