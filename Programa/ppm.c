@@ -16,9 +16,21 @@
 #include "ppm.h"
 #include "timer.h"
 
-#define PPM_REG OCR1B
 #define PPM_CALIB_INTERVAL_MS 3000
 #define PPM_CALIB_POST_TIME_MS 6000
+
+/*****************************************
+ * Public Variables
+ *****************************************/
+
+extern uint16_t ppm_reset[] = {
+    0,
+    PPM_MIN,
+    PPM_MIN,
+    PPM_MID,
+    PPM_MID,
+    PPM_MID,
+};
 
 /*****************************************
  * Public Functions Bodies Definitions
@@ -36,11 +48,9 @@ void ppm_init() {
 
     ICR1 = TIM_PPM_PERIOD;  // Para a frequencia ser 50 Hz
 
-    PPM_REG = 0;
 }
 
 void calibrate(ppm_mode_t mode) {
-    timer_deinit();
     ppm_init();
 
     if ((mode == VAR_UNI) | (mode == FIXO_UNI)) {  // Calibrar
@@ -104,6 +114,8 @@ void ppm(uint8_t adc, ppm_mode_t mode) {
         case FIXO_UNI: {  // fixo, unidirecional
             if (PPM_REG < ppm_max_uni) {
                 PPM_REG++;
+            } else if (PPM_REG > ppm_max_uni){
+                PPM_REG--;
             }
 
             break;

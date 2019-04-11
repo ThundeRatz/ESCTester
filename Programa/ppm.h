@@ -15,6 +15,8 @@
  * Public Constant Definitions
  *****************************************/
 
+#define PPM_REG OCR1B
+
 #define PPM_MIN (1000)
 #define PPM_MID (1460)
 #define PPM_MAX (2000)
@@ -36,6 +38,12 @@ typedef enum ppm_mode {
     VAR_UM_BI,   /**< Fixed bidirectional */
     FIXO_BI,     /**< Fixed bidirectional */
 } ppm_mode_t;
+
+/*****************************************
+ * Public Variables
+ *****************************************/
+
+extern uint16_t ppm_reset[];
 
 /*****************************************
  * Public Function Prototypes
