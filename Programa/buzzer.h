@@ -17,10 +17,28 @@
 #define BUZZER_PWM_REG OCR1A
 #define BUZZER_BEEP_DELAY_MS 500
 
+/**
+ * @brief Initializes buzzer pin and PWM timer.
+ */
 void buzzer_init(void);
 
+/**
+ * @brief Turns buzzer on.
+ * 
+ * @note Buzzer needs PWM on its pin.
+ */
 void buzzer_on(void);
+
+/**
+ * @brief Turns buzzer off.
+ */
 void buzzer_off(void);
+
+/**
+ * @brief Beeps the buzzer.
+ * 
+ * @param beeps Number of beeps.
+ */
 void buzzer_beep(uint8_t beeps);
 
 #endif  // __BUZZER_H__

@@ -1,4 +1,4 @@
-/*!
+/**
  * @file    led.h
  * @brief   ThundeRatz's ESC_Tester Project Firmware.
  *
@@ -12,8 +12,9 @@
 #if !defined(__LED_H__)
 #define __LED_H__
 
+
 void led_init(void);
 void led_off(void);
 void led_on(void);
 
-#endif // __LED_H__
+#endif  // __LED_H__

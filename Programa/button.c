@@ -1,4 +1,4 @@
-/*!
+/**
  * @file    button.c
  * @brief   ThundeRatz's ESC_Tester Project Firmware.
  *
@@ -13,6 +13,7 @@
 
 #include "button.h"
 
-uint8_t button(){
+uint8_t button(void) {
+    //Retorna a leitura do botao
     return PIND & (1 << PD2);
 }
