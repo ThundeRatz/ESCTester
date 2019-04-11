@@ -1,26 +1,29 @@
-/*!
+/**
  * @file    led.c
  * @brief   ThundeRatz's ESC_Tester Project Firmware.
  *
- * @author  ThundeRatz Robotics Team - POLI-USP: http://thunderatz.org/
- *          Support email: contato@thunderatz.org
- *          Hama
+ * @author Gustavo Hama <gustavo.hama@thunderatz.org>
+ * @author Daniel Nery <daniel.nery@thunderatz.org>
  *
- * @date    11 March 2019
+ * @date 04/2018
  */
 
 #include <avr/io.h>
 
 #include "led.h"
 
-void led_init(){
-    DDRB |= (1 << PB3);
+/*****************************************
+ * Public Functions Bodies Definitions
+ *****************************************/
+
+void led_init(void) {
+    LED_DDR |= (1 << LED_PINX);
 }
 
-void led_off(){
-    PORTB &= ~(1 << PB3);
+void led_off(void) {
+    LED_PORT &= ~(1 << LED_PINX);
 }
 
-void led_on(){
-    PORTB |= (1 << PB3);
+void led_on(void) {
+    LED_PORT |= (1 << LED_PINX);
 }

@@ -1,12 +1,11 @@
-/*!
- * @file    ppm.c
+/**
+ * @file    ppm.h
  * @brief   ThundeRatz's ESC_Tester Project Firmware.
  *
- * @author  ThundeRatz Robotics Team - POLI-USP: http://thunderatz.org/
- *          Support email: contato@thunderatz.org
- *          Hama
+ * @author Gustavo Hama <gustavo.hama@thunderatz.org>
+ * @author Daniel Nery <daniel.nery@thunderatz.org>
  *
- * @date    11 March 2019
+ * @date 04/2018
  */
 
 #include <avr/io.h>
@@ -21,13 +20,17 @@
 #define PPM_CALIB_INTERVAL_MS 3000
 #define PPM_CALIB_POST_TIME_MS 6000
 
+/*****************************************
+ * Public Functions Bodies Definitions
+ *****************************************/
+
 void ppm_init() {
     DDRB |= (1 << PB2);
     TCCR1A &= ~(1 << COM1A1);
     PPM_REG = 0;
 }
 
-void calibrate(mode_t mode) {
+void calibrate(ppm_mode_t mode) {
     timer_deinit();
     pwm_init(TIM_PPM_PERIOD);
 
@@ -50,7 +53,7 @@ void calibrate(mode_t mode) {
     _delay_ms(PPM_CALIB_POST_TIME_MS);
 }
 
-void ppm(uint8_t adc, mode_t mode) {
+void ppm(uint8_t adc, ppm_mode_t mode) {
     static bool subida = true;
 
     uint16_t ppm_max_uni = PPM_MIN + 10 * adc;  // OCR1B vai ate 20000, entao a ppm deve ir de 1000 a 2000.

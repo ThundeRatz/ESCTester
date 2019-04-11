@@ -2,18 +2,20 @@
  * @file    button.c
  * @brief   ThundeRatz's ESC_Tester Project Firmware.
  *
- * @author  ThundeRatz Robotics Team - POLI-USP: http://thunderatz.org/
- *          Support email: contato@thunderatz.org
- *          Hama
+ * @author Gustavo Hama <gustavo.hama@thunderatz.org>
+ * @author Daniel Nery <daniel.nery@thunderatz.org>
  *
- * @date    11 March 2019
+ * @date 04/2018
  */
 
 #include <avr/io.h>
 
 #include "button.h"
 
+/*****************************************
+ * Public Functions Bodies Definitions
+ *****************************************/
+
 uint8_t button(void) {
-    //Retorna a leitura do botao
-    return PIND & (1 << PD2);
+    return BUTTON_PIN & (1 << BUTTON_PINX);
 }

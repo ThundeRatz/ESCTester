@@ -1,32 +1,64 @@
-/*!
+/**
  * @file    ppm.h
  * @brief   ThundeRatz's ESC_Tester Project Firmware.
  *
- * @author  ThundeRatz Robotics Team - POLI-USP: http://thunderatz.org/
- *          Support email: contato@thunderatz.org
- *          Hama
+ * @author Gustavo Hama <gustavo.hama@thunderatz.org>
+ * @author Daniel Nery <daniel.nery@thunderatz.org>
  *
- * @date    11 March 2019
+ * @date 04/2018
  */
 
 #if !defined(__PPM_H__)
 #define __PPM_H__
 
+/*****************************************
+ * Public Constant Definitions
+ *****************************************/
+
 #define PPM_MIN 1000
 #define PPM_MID 1460
 #define PPM_MAX 2000
 
-typedef enum mode {
-    NO_MODE,
-    VAR_UNI,
-    FIXO_UNI,
-    VAR_DOIS_BI,
-    VAR_UM_BI,
-    FIXO_BI,
-} mode_t;
+#define TIM_PPM_PERIOD 16965
 
+/*****************************************
+ * Public Types Definitions
+ *****************************************/
+
+/**
+ * @brief PPM modes
+ */
+typedef enum ppm_mode {
+    NO_MODE,     /**< No mode */
+    VAR_UNI,     /**< Variable unidirectional */
+    FIXO_UNI,    /**< Fixed unidirectional */
+    VAR_DOIS_BI, /**< Variable bidirectional */
+    VAR_UM_BI,   /**< Fixed bidirectional */
+    FIXO_BI,     /**< Fixed bidirectional */
+} ppm_mode_t;
+
+/*****************************************
+ * Public Function Prototypes
+ *****************************************/
+
+/**
+ * @brief Initializes PPM pins.
+ */
 void ppm_init(void);
-void calibrate(mode_t);
-void ppm(uint8_t adc, mode_t mode);
 
-#endif // __PPM_H__
+/**
+ * @brief Calibrates ESC.
+ *
+ * @param mode PPM mode.
+ */
+void calibrate(ppm_mode_t mode);
+
+/**
+ * @brief
+ *
+ * @param adc  ADC reading percentage.
+ * @param mode PPM mode.
+ */
+void ppm(uint8_t adc, ppm_mode_t mode);
+
+#endif  // __PPM_H__

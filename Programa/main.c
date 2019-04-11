@@ -1,12 +1,11 @@
-/*!
+/**
  * @file    main.c
  * @brief   ThundeRatz's ESC_Tester Project Firmware.
  *
- * @author  ThundeRatz Robotics Team - POLI-USP: http://thunderatz.org/
- *          Support email: contato@thunderatz.org
- *          Hama
+ * @author Gustavo Hama <gustavo.hama@thunderatz.org>
+ * @author Daniel Nery <daniel.nery@thunderatz.org>
  *
- * @date    11 March 2019
+ * @date 04/2018
  */
 
 #include <avr/io.h>
@@ -21,22 +20,41 @@
 #include "ppm.h"
 #include "timer.h"
 
-#define BEEPS 3
-#define BUTTON_TIME 15000
+/*****************************************
+ * Private Constant Definitions
+ *****************************************/
 
+#define BEEPS (3)
+#define BUTTON_TIME (15000)
+
+/*****************************************
+ * Private types
+ *****************************************/
+
+/**
+ * @brief FSM states
+ */
 typedef enum state {
-    INIT,
-    CHOOSE,
-    WAIT_BUTTON,
-    PPM,
+    INIT,        /**< Initial state */
+    CHOOSE,      /**< Mode choosing state */
+    WAIT_BUTTON, /**< Wait button release */
+    PPM,         /**< Actual testing */
 } state_t;
+
+/*****************************************
+ * Private Variables
+ *****************************************/
 
 static state_t current_state = INIT;
 
+/*****************************************
+ * Main Function
+ *****************************************/
+
 int main() {
-    uint8_t adc = 0;
-    mode_t mode = NO_MODE;
-    bool calibrado = false;
+    static uint8_t adc = 0;
+    static ppm_mode_t mode = NO_MODE;
+    static bool calibrated = false;
 
     for (;;) {
         switch (current_state) {
@@ -57,7 +75,7 @@ int main() {
                 display(adc);
                 led_on();
 
-                if (button() == 0) {    //Ao apertar o botao
+                if (button() == 0) {  // Ao apertar o botao
                     timer_deinit();
                     pause_timer();
                     reset_timer();
@@ -79,10 +97,10 @@ int main() {
                     buzzer_beep(BEEPS);
 
                     led_off();
-                    //Calibra apenas uma vez
-                    if (calibrado == false) {
+                    // Calibra apenas uma vez
+                    if (calibrated == false) {
                         calibrate(mode);
-                        calibrado = true;
+                        calibrated = true;
                     }
 
                     led_on();
@@ -91,7 +109,7 @@ int main() {
                     reset_timer();
                     timer_deinit();
 
-                    //Configura a ppm em 50Hz
+                    // Configura a ppm em 50Hz
                     pwm_init(TIM_PPM_PERIOD);
                 } else if (button() != 0) {
                     mode = (mode % 5) + 1;  // Modos de 1 a 5
@@ -107,7 +125,7 @@ int main() {
             case PPM: {
                 ppm(adc, mode);
 
-                if (button() == 0) { //Ao apertar o botao, ele volta ao modo de seleção
+                if (button() == 0) {  // Ao apertar o botao, ele volta ao modo de seleção
                     current_state = CHOOSE;
                     timer_deinit();
                 }
