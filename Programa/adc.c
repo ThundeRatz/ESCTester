@@ -1,4 +1,4 @@
-/*!
+/**
  * @file    adc.c
  * @brief   ThundeRatz's ESC_Tester Project Firmware.
  *
@@ -13,14 +13,15 @@
 
 #include "adc.h"
 
-// Inicializacao do ADC
-void adc_init() {
+void adc_init(void) {
+    // Inicializacao do ADC com referencia no AVCC e prescale de 128
     ADMUX |= (1 << REFS0);
     ADCSRA |= (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
 }
 
-uint8_t get_adc() {
+uint8_t get_adc(void) {
     uint8_t measure;
+
     // Inicia a conversao
     ADCSRA |= (1 << ADSC);
 

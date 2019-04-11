@@ -13,6 +13,7 @@
 #include <util/delay.h>
 
 #include "buzzer.h"
+#include "led.h"
 #include "timer.h"
 
 void buzzer_on(void) {

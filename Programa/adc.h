@@ -1,4 +1,4 @@
-/*!
+/**
  * @file    adc.h
  * @brief   ThundeRatz's ESC_Tester Project Firmware.
  *
@@ -14,7 +14,19 @@
 
 #include <stdint.h>
 
-void adc_init();
-uint8_t get_adc();
+/**
+ * @brief Initializes ADC registers.
+ * 
+ * @note Uses AVCC as reference and 128 prescaler.
+ */
+void adc_init(void);
 
-#endif // __ADC_H__
+/**
+ * @brief Gets ADC value.
+ * 
+ * @return ADC value.
+ * @retval 0-99 percentage of max ADC value (1023).
+ */
+uint8_t get_adc(void);
+
+#endif  // __ADC_H__
