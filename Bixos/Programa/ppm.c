@@ -64,5 +64,5 @@ void ppm(uint8_t adc, ppm_mode_t mode) {
         }
     }
 
-    _delay_ms(15);
+    _delay_ms(150);
 }
