@@ -109,7 +109,7 @@ int main() {
                     ppm_init();
                     PPM_REG = ppm_reset[mode];
                 } else if (!button_pressed()) {
-                    mode = (mode % 5) + 1;  // Modos de 1 a 5
+                    mode = (mode % 2) + 1;  // Modos de 1 a 5
                     display(mode);
                     _delay_ms(500);
 
