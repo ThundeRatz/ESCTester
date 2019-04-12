@@ -21,6 +21,19 @@
 #define PPM_CALIB_POST_TIME_MS 6000
 
 /*****************************************
+ * Public Variables
+ *****************************************/
+
+extern uint16_t ppm_reset[] = {
+    0,
+    PPM_MIN,
+    PPM_MIN,
+    PPM_MID,
+    PPM_MID,
+    PPM_MID,
+};
+
+/*****************************************
  * Public Functions Bodies Definitions
  *****************************************/
 

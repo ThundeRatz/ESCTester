@@ -19,7 +19,7 @@
  * Private Constant Definitions
  *****************************************/
 
-#define TIM_BUZZER_PERIOD (2000)
+// #define TIM_BUZZER_PERIOD (2000)
 
 /*****************************************
  * Public Functions Bodies Definitions

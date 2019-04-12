@@ -48,6 +48,8 @@ void buzzer_off(void);
  * @brief Beeps the buzzer.
  *
  * @note This function calls buzzer_init()
+ * @note If beep -> led is on / else -> led is off
+ * @note beep time -> BUZZER_BEEP_DELAY_MS, off time -> BUZZER_BEEP_DELAY_MS
  *
  * @param beeps Number of beeps.
  */

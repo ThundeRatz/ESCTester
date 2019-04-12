@@ -25,6 +25,8 @@ void display_init(void);
 /**
  * @brief Display dozen at display 2 and units at display 1.
  *
+ * @note Time between show display 1 and display 2
+ *
  * @param digit number to be displayed
  */
 void display(uint8_t digit);

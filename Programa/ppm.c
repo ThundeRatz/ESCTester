@@ -23,7 +23,7 @@
  * Public Variables
  *****************************************/
 
-extern uint16_t ppm_reset[] = {
+uint16_t ppm_reset[] = {
     0,
     PPM_MIN,
     PPM_MIN,

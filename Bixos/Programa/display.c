@@ -46,7 +46,7 @@
 #define SD2 (1 << PD7)
 
 /*****************************************
- * Private Function Prototypes
+ * Private Function Prototypes (LEIA!)
  *****************************************/
 
 /**
@@ -82,7 +82,7 @@ void clear_display(void) {
 }
 
 /*****************************************
- * Private Functions Bodies Definitions
+ * Private Functions Bodies Definitions (APENAS OBSERVE)
  *****************************************/
 
 // pins = PORTD << 8 | PORTB

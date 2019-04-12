@@ -34,7 +34,7 @@
  * @brief Clears timers registers.
  *
  * @note TCNT1 is set to 0
- * @note PPM and Buzzer PWM are turned off.
+ * @note PPM and Buzzer PWM settings are erased.
  */
 void timer_deinit(void);
 
