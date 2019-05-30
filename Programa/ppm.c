@@ -94,17 +94,15 @@ void ppm(uint8_t adc, ppm_mode_t mode) {
         case VAR_UNI: {  // variavel, unidirecional
             if (PPM_REG >= ppm_max_uni) {
                 subida = false;
-                led_off();
             }
 
-            else if (PPM_REG < PPM_MIN) {
+            else if (PPM_REG <= PPM_MIN) {
                 subida = true;
-                led_on();
             }
 
             if (subida) {
                 PPM_REG++;
-            } else if (subida == 0) {
+            } else {
                 PPM_REG--;
             }
 
@@ -122,9 +120,9 @@ void ppm(uint8_t adc, ppm_mode_t mode) {
         }
 
         case VAR_DOIS_BI: {  // variavel, dois sentidos, bidirecional
-            if (PPM_REG == ppm_max_rev) {
+            if (PPM_REG >= ppm_max_rev) {
                 subida = false;
-            } else if (PPM_REG == ppm_min_rev) {
+            } else if (PPM_REG <= ppm_min_rev) {
                 subida = true;
             }
 
@@ -138,9 +136,9 @@ void ppm(uint8_t adc, ppm_mode_t mode) {
         }
 
         case VAR_UM_BI: {  // variavel, um sentido, bidirecional
-            if (PPM_REG == ppm_max_rev) {
+            if (PPM_REG >= ppm_max_rev) {
                 subida = false;
-            } else if (PPM_REG == PPM_MID) {
+            } else if (PPM_REG <= PPM_MID) {
                 subida = true;
             }
 
@@ -154,8 +152,10 @@ void ppm(uint8_t adc, ppm_mode_t mode) {
         }
 
         case FIXO_BI: {  // fixo, bidirecional
-            if (PPM_REG < ppm_max_rev) {
+            if (PPM_REG = ppm_max_rev) {
                 PPM_REG++;
+            } else if (PPM_REG > ppm_max_rev) {
+                PPM_REG--;
             }
 
             break;

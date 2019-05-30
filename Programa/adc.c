@@ -31,7 +31,7 @@ uint8_t get_adc(void) {
     while (ADCSRA & (1 << ADSC))
         ;
 
-    measure = 100 * (float) ADC / 1024.0;  // Porcentagem
+    measure = (100 * ADC) >> 10;  // Porcentagem 100 * ADC / 1024 (2 ^ 10)
 
     return measure;
 }

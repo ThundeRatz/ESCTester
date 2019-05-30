@@ -23,24 +23,27 @@ PART       = $(MCU)
 
 # Tune the lines below only if you know what you are doing:
 
-OBJECTS = $(patsubst %$(EXT),%.o,$(wildcard *$(EXT)))
+OBJECTS = $(patsubst %$(EXT),build/%.o,$(wildcard *$(EXT)))
 FUSES   = -U lfuse:w:$(LFUSE):m -U hfuse:w:$(HFUSE):m
 AVRDUDE = avrdude -c $(PROGRAMMER) -p $(PART)
 COMPILE = avr-gcc -Wall -Os -mcall-prologues -Wextra -DF_CPU=$(CLOCK)000000 -mmcu=$(MCU) -std=c99 -fshort-enums
-SIZE    = avr-size -C --mcu=$(MCU) main.elf
+SIZE    = avr-size -C --mcu=$(MCU) build/main.elf
 
 .PHONY: all clean load reload flash size fuse read help copy copy_flash copy_fuses copy_eeprom
 
-all: main.hex
+all: build/main.hex
 
-%.o: %$(EXT)
+build/%.o: %$(EXT) Makefile | build
 	@echo "Compilando "$<
 	@$(COMPILE) -c $< -o $@
 	@echo "Ok."
 
+build:
+	@mkdir -p build
+
 load:
 	@echo "Gravando..."
-	@$(AVRDUDE) -U flash:w:main.hex:i
+	@$(AVRDUDE) -U flash:w:build/main.hex:i
 	@make size
 
 reload: all load
@@ -97,7 +100,7 @@ copy: copy_eeprom copy_flash copy_fuses
 
 clean:
 	@echo "Removendo arquivos..."
-	@rm -f main.hex main.elf $(OBJECTS)
+	@rm -rf build
 	@echo "Arquivos removidos com sucesso!"
 
 help:
@@ -132,10 +135,10 @@ help:
 	@echo "	High Fuse  = "$(HFUSE)
 
 # file targets:
-main.elf: $(OBJECTS)
+build/main.elf: $(OBJECTS) Makefile
 	@echo "Compilando main.elf para "$(MCU)", mude o Makefile se necessario."
-	@$(COMPILE) -o main.elf $(OBJECTS)
+	@$(COMPILE) -o build/main.elf $(OBJECTS)
 
-main.hex: main.elf
-	@rm -f main.hex
-	@avr-objcopy -j .text -j .data -O ihex main.elf main.hex
+build/main.hex: build/main.elf Makefile
+	@rm -f build/main.hex
+	@avr-objcopy -j .text -j .data -O ihex build/main.elf build/main.hex
