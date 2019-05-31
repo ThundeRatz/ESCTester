@@ -35,7 +35,7 @@ void buzzer_init(void) {
     // Habilita
     TCCR1A |= (1 << COM1A1);
 
-    ICR1 = TIM_BUZZER_PERIOD;  // Para a frequencia ser 50 Hz
+    ICR1 = TIM_BUZZER_PERIOD;
 
     buzzer_off();
 }

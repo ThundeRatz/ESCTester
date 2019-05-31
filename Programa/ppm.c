@@ -94,9 +94,7 @@ void ppm(uint8_t adc, ppm_mode_t mode) {
         case VAR_UNI: {  // variavel, unidirecional
             if (PPM_REG >= ppm_max_uni) {
                 subida = false;
-            }
-
-            else if (PPM_REG <= PPM_MIN) {
+            } else if (PPM_REG <= PPM_MIN) {
                 subida = true;
             }
 
@@ -152,7 +150,7 @@ void ppm(uint8_t adc, ppm_mode_t mode) {
         }
 
         case FIXO_BI: {  // fixo, bidirecional
-            if (PPM_REG = ppm_max_rev) {
+            if (PPM_REG < ppm_max_rev) {
                 PPM_REG++;
             } else if (PPM_REG > ppm_max_rev) {
                 PPM_REG--;
