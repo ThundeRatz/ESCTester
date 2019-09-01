@@ -1,7 +1,7 @@
 ![](docs/LogoTR-Vertical_Azul.png)
 # ESC Tester
 
-Repositório do projeto de uma ESC Tester, feito para o processo seletivo da equipe de robótica ThundeRatz de 2019.
+Repositório do projeto de uma ESC Tester, feito para o processo seletivo de 2019 da equipe de robótica ThundeRatz.
 
 
 # Placa
